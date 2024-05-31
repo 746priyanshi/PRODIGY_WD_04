@@ -1,0 +1,77 @@
+#include <iostream>
+using namespace std;
+
+#define SIZE 9
+
+bool isValid(int board[SIZE][SIZE], int row, int col, int num) {
+    // Check if num is not in the current row and column
+    for (int x = 0; x < SIZE; x++) {
+        if (board[row][x] == num || board[x][col] == num) {
+            return false;
+        }
+    }
+
+    // Check if num is not in the current 3x3 subgrid
+    int startRow = row - row % 3;
+    int startCol = col - col % 3;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 3; j++) {
+            if (board[i + startRow][j + startCol] == num) {
+                return false;
+            }
+        }
+    }
+
+    return true;
+}
+
+bool solveSudoku(int board[SIZE][SIZE]) {
+    for (int row = 0; row < SIZE; row++) {
+        for (int col = 0; col < SIZE; col++) {
+            if (board[row][col] == 0) { // find an empty cell
+                for (int num = 1; num <= SIZE; num++) {
+                    if (isValid(board, row, col, num)) {
+                        board[row][col] = num;
+                        if (solveSudoku(board)) {
+                            return true;
+                        }
+                        board[row][col] = 0; // reset on backtrack
+                    }
+                }
+                return false; // trigger backtracking
+            }
+        }
+    }
+    return true; // puzzle solved
+}
+
+void printBoard(int board[SIZE][SIZE]) {
+    for (int row = 0; row < SIZE; row++) {
+        for (int col = 0; col < SIZE; col++) {
+            cout << board[row][col] << " ";
+        }
+        cout << endl;
+    }
+}
+
+int main() {
+    int board[SIZE][SIZE] = {
+        {5, 3, 0, 0, 7, 0, 0, 0, 0},
+        {6, 0, 0, 1, 9, 5, 0, 0, 0},
+        {0, 9, 8, 0, 0, 0, 0, 6, 0},
+        {8, 0, 0, 0, 6, 0, 0, 0, 3},
+        {4, 0, 0, 8, 0, 3, 0, 0, 1},
+        {7, 0, 0, 0, 2, 0, 0, 0, 6},
+        {0, 6, 0, 0, 0, 0, 2, 8, 0},
+        {0, 0, 0, 4, 1, 9, 0, 0, 5},
+        {0, 0, 0, 0, 8, 0, 0, 7, 9}
+    };
+
+    if (solveSudoku(board)) {
+        printBoard(board);
+    } else {
+        cout << "No solution exists." << endl;
+    }
+
+    return 0;
+}
